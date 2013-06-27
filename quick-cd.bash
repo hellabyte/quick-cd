@@ -39,7 +39,7 @@ DESCRIPTION
 EOF
 }
 if [ $# == 0 ]; then
-    echo "ERROR -- scd requires arguments." >&2
+    echo "ERROR -- qcd requires arguments." >&2
     return 1
 fi
 BASEDIRS=(); PATHS=()
