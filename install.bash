@@ -1,9 +1,9 @@
 #!/bin/bash
-# (C) 2013 - June - 26
+# (C) 2013 - July - 02
 # Nathaniel Hellabyte
 # nate@hellabit.es
 # RECOMMENDED USAGE
-#   bash -c ./install.bash
+#   bash ./install.bash
 # INSTALLS quick-cd.bash
 # TO       /usr/local/lib 
 #          /usr/local/bin
@@ -14,10 +14,11 @@
 # = = = = = = = = = = = = = =-
 
 PROGRAM_RAW="$(pwd)/quick-cd.bash"
-PROGRAM_TARGET="/usr/local/bin/quick-cd"
+PROGRAM_TARGET_LIB="/usr/local/lib/quick-cd"
+PROGRAM_TARGET_BIN="/usr/local/bin/quick-cd"
 FUNCTIONS_RAW="$(pwd)/functions.bash"
-FUNCTIONS_TARGET="${HOME}.bashrc"
-FUNCTIONS_TEMP="${HOME}.bashrctemp"
+FUNCTIONS_TARGET="${HOME}/.bashrc"
+FUNCTIONS_TEMP="${HOME}/.bashrctemp"
 NEW_HOME_DIR="${HOME}/.quick-cd"
 GENERAL_DIR="${NEW_HOME_DIR}/.general_dirs"
 QUERIED_DIR="${NEW_HOME_DIR}/.queried_dirs"
@@ -33,12 +34,12 @@ fi
 touch $GENERAL_DIR $QUERIED_DIR
 cp $FUNCTIONS_TARGET "${FUNCTIONS_TARGET_BACKUP}"
 
-if [ -f $PROGRAM_TARGET ]; then
-    echo "WARNING--${PROGRAM_TARGET} ALREADY EXISTS."
+if [ -f $PROGRAM_TARGET_LIB ]; then
+    echo "WARNING--${PROGRAM_TARGET_LIB} ALREADY EXISTS."
     while true; do
         read -p "overwrite? [y/n]: " OVERWRITE_DECISION || return
         if [ "$OVERWRITE_DECISION" == 'y' ]; then
-            rm $PROGRAM_TARGET
+            rm $PROGRAM_TARGET_LIB
             break
         else
             echo "Choosing to quit because of overwrite potential."
@@ -61,8 +62,10 @@ if [ -f $FUNCTIONS_TARGET ]; then
     fi
 fi
 
-chmod 744 $PROGRAM_RAW
-ln -s $PROGRAM_RAW $PROGRAM_TARGET
+cp $PROGRAM_RAW $PROGRAM_TARGET_LIB
+chmod 744 $PROGRAM_TARGET_LIB
+if [ -f $PROGRAM_TARGET_BIN ]; then
+    rm $PROGRAM_TARGET_BIN
+fi
+ln -s $PROGRAM_TARGET_LIB $PROGRAM_TARGET_BIN
 cat $FUNCTIONS_RAW >> $FUNCTIONS_TARGET
-
-builtin source $FUNCTIONS_TARGET

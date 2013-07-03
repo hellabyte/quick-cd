@@ -1,5 +1,5 @@
 #!/bin/bash
-# (C) 2013 - June - 26 
+# (C) 2013 - July - 02
 # Nathaniel Hellabyte
 # nate@hellabit.es
 # = = = = = = = = = = =-
@@ -9,12 +9,14 @@ cat << EOF
 NAME
     qcd -- quick change directory
 SYNOPSIS
-    qcd [-sdpith]
-    qcd [-d <depth>] [-p <path>] [-i <index>] [-t <time>] [-s] <searchterm>
+    qcd [-asdpith]
+    qcd [-d <depth>] [-a <path>] [-p <path>] [-i <index>] [-t <time>] [-s] <searchterm>
 DESCRIPTION
   MAIN PROGRAM LOOP:
         find \$BASEDIRS -maxdepth \$MAXDEPTH -type d -iname \$SEARCHTERM 
   OPTIONS
+    -a 
+        Appends directory specified to ${HOME}/.quick-cd/.general_dirs.
     -s
         Specifies which directory to find. RECOMMENDED use when other flags are implemented.
         Program will try to search for last option even if -s is not passed.
@@ -57,8 +59,17 @@ while read LINE; do
 done < "${TEMP_DIRS}"
 mv $TEMP_DIRS $GENERAL_DIRS
 OPTIND=1
-while getopts ":d:p:i:s:t:h" OPTNAME; do
+while getopts ":a:d:p:i:s:t:h" OPTNAME; do
     case $OPTNAME in
+        'a')
+            APPEND_DIR=$OPTARG
+            if [ -d $APPEND_DIR ]; then
+                echo "${OPTARG}" >> $GENERAL_DIRS
+            else
+                echo "${OPTARG} is an invalid specification for -a" >&2
+                return 1
+            fi
+            ;;
         'd')
             MAXDEPTH=$OPTARG
             ;;
@@ -124,7 +135,12 @@ if [ "$LENGTH" == 0 ]; then
     echo "No results found." >&2
     return 3
 elif [ "$LENGTH" == 1 ]; then
-    cd ${PATHS[0]}
+    if [ "${PATHS[0]}" = "" ]; then
+        echo "Result not found. Consider increasing depth from current value of $MAXDEPTH with -d flag." >&2
+        return 3
+    else
+        cd ${PATHS[0]}
+    fi
 else
     if [ $INDEX == -1 ]; then
         echo "There were many results. Printing candidates:"
@@ -159,3 +175,5 @@ else
         return 1
     fi
 fi
+
+
