@@ -34,15 +34,15 @@ For more info:
 Desired Future Modifications
 ============================
 ### Important Feature TODOs: ###
-    * Keyword completion.
-    * ZSH compatibility.
+    Keyword completion.  
+    ZSH compatibility.  
 
 
 #### General TODOs: ####
-    * Increased portability. 
-    * Increased performance.
-    * Increased readability.
-    * Increased intelligence of general_dirs. 
+    Increased portability.                    
+    Increased performance.                    
+    Increased readability.                    
+    Increased intelligence of general_dirs.   
 
 Make sure that any updates to the program have the version date updated in the functions.bash
 file as well (4th comment line).
