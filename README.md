@@ -16,7 +16,7 @@ It is recommended to do the following with a tar.gz until an installer is in pla
 
 tar xzvf quick-cd.tar.gz /usr/local/lib/quick-cd
 cd /usr/local/lib/quick-cd
-bash install.bash
+sudo bash install.bash
 
 You may want to remove the tarball after statisifed that the package installed correctly.
 Otherwise, enjoy qcd and try not to get too spoiled!
