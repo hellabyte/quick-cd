@@ -1,8 +1,7 @@
 quick-cd
 ========
 
-qcd -- Quickly Change Directory
--------------------------------
+#### qcd #### -- ##### Quickly Change Directory #####
 
 By utilizing the find command and a list of commonly used directories,
 qcd will attempt to switch into a nested directory with just one keyword.
@@ -30,19 +29,16 @@ Usage
 qcd annoying-to-reach-manually-directory-keyword
 
 For more info:  
-- - -
-qcd -h
+    qcd -h
 
 Desired Future Modifications
 ============================
-Important Feature TODOs:
------------------------
+### Important Feature TODOs: ###
     *Keyword completion.
     *ZSH compatibility.
 
 
-General TODOs:
---------------
+#### General TODOs: ####
     *Increased portability. 
     *Increased performance.
     *Increased readability.
@@ -52,4 +48,3 @@ Make sure that any updates to the program have the version date updated in the f
 file as well (4th comment line).
 
 (C) 2013 - July - 05 Nathaniel Hellabyte nate@hellabit.es
----------------------------------------------------------
