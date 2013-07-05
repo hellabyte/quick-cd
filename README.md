@@ -2,6 +2,7 @@ quick-cd
 ========
 
 qcd -- Quickly Change Directory
+-------------------------------
 
 By utilizing the find command and a list of commonly used directories,
 qcd will attempt to switch into a nested directory with just one keyword.
@@ -16,9 +17,9 @@ Installation
 Note that qcd must reside sourced in the current enviroment to be of use.
 It is recommended to do the following with a tar.gz until an installer is in place:
 
-tar xzvf quick-cd.tar.gz /usr/local/lib/quick-cd
-cd /usr/local/lib/quick-cd
-sudo bash install.bash
+tar xzvf quick-cd.tar.gz /usr/local/lib/quick-cd  
+cd /usr/local/lib/quick-cd  
+sudo bash install.bash  
 
 You may want to remove the tarball after statisifed that the package installed correctly.
 Otherwise, enjoy qcd and try not to get too spoiled!
@@ -27,22 +28,28 @@ Usage
 =====
 
 qcd annoying-to-reach-manually-directory-keyword
-For more info:
-    qcd -h
+
+For more info:  
+- - -
+qcd -h
 
 Desired Future Modifications
 ============================
-Feature TODOs:
-    Keyword completion.
-    ZSH compatibility.
+Important Feature TODOs:
+-----------------------
+    *Keyword completion.
+    *ZSH compatibility.
+
 
 General TODOs:
-    Increased portability. 
-    Increased performance.
-    Increased readability.
-    Increased intelligence of general_dirs.
+--------------
+    *Increased portability. 
+    *Increased performance.
+    *Increased readability.
+    *Increased intelligence of general_dirs.
 
 Make sure that any updates to the program have the version date updated in the functions.bash
 file as well (4th comment line).
 
 (C) 2013 - July - 05 Nathaniel Hellabyte nate@hellabit.es
+---------------------------------------------------------
