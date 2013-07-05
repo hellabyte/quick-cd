@@ -13,14 +13,15 @@
 # BACKUPS  $FUNCTIONS_TARGET 
 # = = = = = = = = = = = = = =-
 
+USER_HOME=$(eval echo ~${SUDO_USER})
 PROGRAM_RAW="$(pwd)/quick-cd.bash"
 FUNCTIONS_RAW="$(pwd)/functions.bash"
 PROGRAM_TARGET_LIB="/usr/local/lib/quick-cd"
 PROGRAM_TARGET_BIN="/usr/local/bin/quick-cd"
-NEW_HOME_DIR="${HOME}/.quick-cd"
+NEW_HOME_DIR="${USER_HOME}/.quick-cd"
 GENERAL_DIR="${NEW_HOME_DIR}/.general_dirs"
 QUERIED_DIR="${NEW_HOME_DIR}/.queried_dirs"
-FUNCTIONS_SOURCE_TARGET="${HOME}/.bashrc"
+FUNCTIONS_SOURCE_TARGET="${USER_HOME}/.bashrc"
 FUNCTIONS_TARGET_BACKUP="${NEW_HOME_DIR}/.backups"
 FUNCTIONS_TARGET="${FUNCTIONS_TARGET_BACKUP}/.supporting_rc.bash"
 FUNCTIONS_TEMP="${FUNCTIONS_TARGET_BACKUP}/.supporting_rc_temp"
