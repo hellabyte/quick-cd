@@ -25,7 +25,7 @@ FUNCTIONS_TARGET_BACKUP="${NEW_HOME_DIR}/.backups"
 FUNCTIONS_TARGET="${FUNCTIONS_TARGET_BACKUP}/.supporting_rc.bash"
 FUNCTIONS_TEMP="${FUNCTIONS_TARGET_BACKUP}/.supporting_rc_temp"
 
-[[ -f $PROGRAM_RAW ]] || ( echo "Please change into directory containing install files" >&2 && return 3 )
+[[ -f $PROGRAM_RAW ]] || ( echo "Please change into directory containing install files" >&2 && exit 3 )
 
 if [ ! -d $NEW_HOME_DIR ]; then
     mkdir -p $NEW_HOME_DIR
@@ -40,7 +40,7 @@ cp $FUNCTIONS_SOURCE_TARGET "${FUNCTIONS_TARGET_BACKUP}"
 if [ -f $PROGRAM_TARGET_LIB ]; then
     echo "WARNING--${PROGRAM_TARGET_LIB} ALREADY EXISTS."
     while true; do
-        read -p "overwrite? [y/n]: " OVERWRITE_DECISION || return
+        read -p "overwrite? [y/n]: " OVERWRITE_DECISION || exit
         if [ "$OVERWRITE_DECISION" == 'y' ]; then
             rm $PROGRAM_TARGET_LIB
             break
@@ -69,13 +69,13 @@ if [ -f $FUNCTIONS_SOURCE_TARGET ]; then
     fi
 fi
 
-cp $PROGRAM_RAW $PROGRAM_TARGET_LIB || return 72
-chmod 744 $PROGRAM_TARGET_LIB || return 73
+cp $PROGRAM_RAW $PROGRAM_TARGET_LIB || exit 72
+chmod 744 $PROGRAM_TARGET_LIB || exit 73
 if [ -f $PROGRAM_TARGET_BIN ]; then
-    rm $PROGRAM_TARGET_BIN | return 75
+    rm $PROGRAM_TARGET_BIN | exit 75
 fi
-ln -s $PROGRAM_TARGET_LIB $PROGRAM_TARGET_BIN || return 77
-cp $FUNCTIONS_RAW $FUNCTIONS_TARGET || return 78
+ln -s $PROGRAM_TARGET_LIB $PROGRAM_TARGET_BIN || exit 77
+cp $FUNCTIONS_RAW $FUNCTIONS_TARGET || exit 78
 cat << EOF >> $FUNCTIONS_SOURCE_TARGET 
 # BEGIN QUICK-CD FUNCTIONS
 # DO NOT DELETE ABOVE COMMENT
