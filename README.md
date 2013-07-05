@@ -24,7 +24,7 @@ Otherwise, enjoy qcd and try not to get too spoiled!
 Usage
 =====
 
-qcd annoying-to-reach-manually-directory
+qcd annoying-to-reach-manually-directory-keyword
 For more info:
     qcd -h
 
@@ -42,4 +42,4 @@ General TODOs:
 Make sure that any updates to the program have the version date updated in the functions.bash
 file as well (4th comment line).
 
-(C) 2013 - July - 02 Nathaniel Hellabyte nate@hellabit.es
+(C) 2013 - July - 05 Nathaniel Hellabyte nate@hellabit.es

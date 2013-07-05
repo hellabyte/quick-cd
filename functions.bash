@@ -1,7 +1,7 @@
 # BEGIN QUICK-CD FUNCTIONS
 # DO NOT INSERT ANYTHING BETWEEN BEGIN AND END
 # DO NOT REMOVE THESE COMMENTS AS THEY ARE IMPORTANT FOR UNINSTALLING
-# VERSION DATE 2013 - July - 02
+# VERSION DATE 2013 - July - 05
 # qcd 
 #   sources quick-cd and allows for getopts to work in the environment
 function qcd(){
@@ -25,8 +25,8 @@ CD_COUNT=0
 #   directories can be built. Supplemental to qcd, as a more
 #   mature .common_dirs file increases the usability of qcd.
 function cd(){
-    TARGET_DIR=$1
-    builtin cd $TARGET_DIR || return
+    TARGET_DIR=$(echo -e "${1}")
+    builtin cd "$TARGET_DIR" || return
 
     builtin echo "$(pwd)" >> $GENERAL_DIRS
     builtin let CD_COUNT++

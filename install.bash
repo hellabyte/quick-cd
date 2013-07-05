@@ -1,5 +1,5 @@
 #!/bin/bash
-# (C) 2013 - July - 02
+# (C) 2013 - July - 05
 # Nathaniel Hellabyte
 # nate@hellabit.es
 # RECOMMENDED USAGE
@@ -14,15 +14,18 @@
 # = = = = = = = = = = = = = =-
 
 PROGRAM_RAW="$(pwd)/quick-cd.bash"
+FUNCTIONS_RAW="$(pwd)/functions.bash"
 PROGRAM_TARGET_LIB="/usr/local/lib/quick-cd"
 PROGRAM_TARGET_BIN="/usr/local/bin/quick-cd"
-FUNCTIONS_RAW="$(pwd)/functions.bash"
-FUNCTIONS_TARGET="${HOME}/.bashrc"
-FUNCTIONS_TEMP="${HOME}/.bashrctemp"
 NEW_HOME_DIR="${HOME}/.quick-cd"
 GENERAL_DIR="${NEW_HOME_DIR}/.general_dirs"
 QUERIED_DIR="${NEW_HOME_DIR}/.queried_dirs"
+FUNCTIONS_SOURCE_TARGET="${HOME}/.bashrc"
 FUNCTIONS_TARGET_BACKUP="${NEW_HOME_DIR}/.backups"
+FUNCTIONS_TARGET="${FUNCTIONS_TARGET_BACKUP}/.supporting_rc.bash"
+FUNCTIONS_TEMP="${FUNCTIONS_TARGET_BACKUP}/.supporting_rc_temp"
+
+[[ -f $PROGRAM_RAW ]] || ( echo "Please change into directory containing install files" >&2 && return 3 )
 
 if [ ! -d $NEW_HOME_DIR ]; then
     mkdir -p $NEW_HOME_DIR
@@ -32,7 +35,7 @@ if [ ! -d $FUNCTIONS_TARGET_BACKUP ]; then
 fi
 
 touch $GENERAL_DIR $QUERIED_DIR
-cp $FUNCTIONS_TARGET "${FUNCTIONS_TARGET_BACKUP}"
+cp $FUNCTIONS_SOURCE_TARGET "${FUNCTIONS_TARGET_BACKUP}"
 
 if [ -f $PROGRAM_TARGET_LIB ]; then
     echo "WARNING--${PROGRAM_TARGET_LIB} ALREADY EXISTS."
@@ -48,17 +51,21 @@ if [ -f $PROGRAM_TARGET_LIB ]; then
     done
 fi
 
-if [ -f $FUNCTIONS_TARGET ]; then
+if [ -f $FUNCTIONS_SOURCE_TARGET ]; then
     BEG_FLAG="# BEGIN QUICK-CD FUNCTIONS"
     END_FLAG="# END QUICK-CD FUNCTIONS"
-    BEG_FLAG_LINE_NUMBER=$(grep -n "$BEG_FLAG" $FUNCTIONS_TARGET | cut -f 1 -d ':')
-    END_FLAG_LINE_NUMBER=$(grep -n "$END_FLAG" $FUNCTIONS_TARGET | cut -f 1 -d ':')
-    if [ ! -z $BEG_FLAG_LINE_NUMBER ]; then
-        if [ ! -z $END_FLAG_LINE_NUMBER ]; then
-            BLN=$BEG_FLAG_LINE_NUMBER; ELN=$END_FLAG_LINE_NUMBER;
-            sed "${BLN},${ELN}d" $FUNCTIONS_TARGET > $FUNCTIONS_TEMP
-            mv $FUNCTIONS_TEMP $FUNCTIONS_TARGET
+    BEG_FLAG_LINE_NUMBER=$(grep -n "$BEG_FLAG" $FUNCTIONS_SOURCE_TARGET | cut -f 1 -d ':')
+    END_FLAG_LINE_NUMBER=$(grep -n "$END_FLAG" $FUNCTIONS_SOURCE_TARGET | cut -f 1 -d ':')
+    read -a BLN -d ' ' < <(echo "${BEG_FLAG_LINE_NUMBER[@]}")
+    read -a ELN -d ' ' < <(echo "${END_FLAG_LINE_NUMBER[@]}")
+    BIN=0; EIN=$((${#ELN[@]} - 1))
+    if [ ${#BLN[@]} -eq ${#ELN[@]} ]; then
+        if [ $EIN -ne -1 ]; then
+            sed "${BLN[$BIN]},${ELN[$EIN]}d" $FUNCTIONS_SOURCE_TARGET > $FUNCTIONS_TEMP
+            mv $FUNCTIONS_TEMP $FUNCTIONS_SOURCE_TARGET
         fi
+    else
+        echo "WARNING -- Manual tidying of $FUNCTIONS_SOURCE_TARGET required." >&2
     fi
 fi
 
@@ -68,4 +75,11 @@ if [ -f $PROGRAM_TARGET_BIN ]; then
     rm $PROGRAM_TARGET_BIN
 fi
 ln -s $PROGRAM_TARGET_LIB $PROGRAM_TARGET_BIN
-cat $FUNCTIONS_RAW >> $FUNCTIONS_TARGET
+cp $FUNCTIONS_RAW $FUNCTIONS_TARGET
+cat << EOF >> $FUNCTIONS_SOURCE_TARGET
+# BEGIN QUICK-CD FUNCTIONS
+# DO NOT DELETE ABOVE COMMENT
+[[ -f "$FUNCTIONS_TARGET" ]] && builtin source "$FUNCTIONS_TARGET"
+# DO NOT DELETE BELOW COMMENT
+# END QUICK-CD FUNCTIONS
+EOF
