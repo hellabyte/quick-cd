@@ -8,6 +8,8 @@ qcd will attempt to switch into a nested directory with just one keyword.
 If more than one directory matches the keyword, qcd will print a list and let the
 user select the sought after directory. 
 
+CURRENTLY ONLY WORKS FOR BASH.
+
 Installation
 ============
 
@@ -32,6 +34,7 @@ Desired Future Modifications
 ============================
 Feature TODOs:
     Keyword completion.
+    ZSH compatibility.
 
 General TODOs:
     Increased portability. 
