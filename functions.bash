@@ -16,6 +16,10 @@ if [ ! -s $GENERAL_DIRS ]; then
     while read -d $'\0' DIRNAME; do 
         echo $DIRNAME >> $GENERAL_DIRS
     done < <(printf "%s\0" "${DIRSTACK[@]}")
+    echo "$HOME"      >> $GENERAL_DIRS
+    echo '\'          >> $GENERAL_DIRS
+    echo '\usr\local' >> $GENERAL_DIRS
+    echo '\etc'       >> $GENERAL_DIRS
 fi
 # CD_COUNT counts the number of times the cd command is used,
 #   allowing for redundancy removal of $GENERAL_DIRS.
@@ -27,7 +31,6 @@ CD_COUNT=0
 function cd(){
     TARGET_DIR=$(echo -e "${1}")
     builtin cd "$TARGET_DIR" || return
-
     builtin echo "$(pwd)" >> $GENERAL_DIRS
     builtin let CD_COUNT++
     # Low number specific to local session redundancy.
