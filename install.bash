@@ -88,25 +88,40 @@ EOF
 }
 
 function function_support_linker {
- cat << EOF >> $FUNCTIONS_SOURCE_SUPPORT   
+    echo "quick-cd resides as an alias in ${FUNCTIONS_SOURCE_TARGET}."
+    echo "In order to work properly, ${FUNCTIONS_SOURCE_TARGET} must"
+    echo "be sourced by the files sourced by BASH environments."
+    echo "Linking now..."
+
+    if [ -f $FUNCTIONS_SOURCE_SUPPORT ]; then
+        BEG_FLAG="# BEGIN QUICK-CD SUPPORT"
+        END_FLAG="# END QUICK-CD SUPPORT"
+        BEG_FLAG_LINE_NUMBER=$(grep -n "$BEG_FLAG" $FUNCTIONS_SOURCE_SUPPORT | cut -f 1 -d ':')
+        END_FLAG_LINE_NUMBER=$(grep -n "$END_FLAG" $FUNCTIONS_SOURCE_SUPPORT | cut -f 1 -d ':')
+        read -a BLN -d ' ' < <(echo "${BEG_FLAG_LINE_NUMBER[@]}")
+        read -a ELN -d ' ' < <(echo "${END_FLAG_LINE_NUMBER[@]}")
+        BIN=0; EIN=$((${#ELN[@]} - 1))
+        if [ ${#BLN[@]} -eq ${#ELN[@]} ]; then
+            if [ $EIN -ne -1 ]; then
+                sed "${BLN[$BIN]},${ELN[$EIN]}d" $FUNCTIONS_SOURCE_SUPPORT > $FUNCTIONS_TEMP
+                mv $FUNCTIONS_TEMP $FUNCTIONS_SOURCE_SUPPORT
+            fi
+        else
+            echo "WARNING -- Manual tidying of $FUNCTIONS_SOURCE_SUPPORT required." >&2
+        fi
+    fi
+    cat << EOF >> $FUNCTIONS_SOURCE_SUPPORT   
 # BEGIN QUICK-CD SUPPORT -- DO NOT DELETE
 [[ -f "$FUNCTIONS_SOURCE_TARGET" ]] && builtin source "$FUNCTIONS_SOURCE_TARGET"
 # END QUICK-CD SUPPORT -- DO NOT DELETE
 EOF
 }
 
-echo "quick-cd resides as an alias in ${FUNCTIONS_SOURCE_TARGET}."
-echo "In order to work properly, ${FUNCTIONS_SOURCE_TARGET} must"
-echo "be sourced by the files sourced by BASH environments."
-
 if [ ! -z $OSTYPE ]; then
     if [ $OSTYPE == "darwin12" ]; then
         echo "It is recommended to install without sudo."
-        if [ ! -f $FUNCTIONS_SOURCE_SUPPORT ]; then
-            touch $FUNCTIONS_SOURCE_SUPPORT
-            function_support_linker
-        fi
         installer
+        function_support_linker
     elif [ $OSTYPE == "gnu-linux" ]; then
         echo "It is recommended to install with sudo."
         sudo -p "${USER}, please provide your password to allow sudo: " installer
