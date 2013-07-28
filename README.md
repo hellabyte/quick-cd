@@ -17,7 +17,7 @@ Note that qcd must reside sourced in the current enviroment to be of use.
 For Mac OS X, it is recommended to do the following with a
  tar.gz until a formal installer is in place:
 
-tar xzvf quick-cd.tar.gz /usr/local/lib/quick-cd  
+tar -C /usr/local/lib/quick-cd -xzvf quick-cd.tar.gz
 cd /usr/local/lib/quick-cd  
 bash install.bash  
 
