@@ -15,8 +15,8 @@
 USER_HOME=$(eval echo ~${SUDO_USER})
 PROGRAM_RAW="$(pwd)/quick-cd.bash"
 FUNCTIONS_RAW="$(pwd)/functions.bash"
-PROGRAM_TARGET_LIB="/usr/local/lib/quick-cd"
-PROGRAM_TARGET_BIN="/usr/local/bin/quick-cd"
+PROGRAM_TARGET_LIB="${1:-/usr/local/lib/quick-cd}"
+PROGRAM_TARGET_BIN="${2:-/usr/local/bin/quick-cd}"
 NEW_HOME_DIR="${USER_HOME}/.quick-cd"
 GENERAL_DIR="${NEW_HOME_DIR}/.general_dirs"
 QUERIED_DIR="${NEW_HOME_DIR}/.queried_dirs"
@@ -25,25 +25,26 @@ FUNCTIONS_TARGET_BACKUP="${NEW_HOME_DIR}/.backups"
 FUNCTIONS_TARGET="${FUNCTIONS_TARGET_BACKUP}/.supporting_rc.bash"
 FUNCTIONS_TEMP="${FUNCTIONS_TARGET_BACKUP}/.supporting_rc_temp"
 FUNCTIONS_SOURCE_SUPPORT="${USER_HOME}/.bash_profile"
+CLIENT_KERNEL="$(uname -s | awk '{print tolower($0)}')"
 
 [[ -f $PROGRAM_RAW ]] || ( echo "Please change into directory containing install files" >&2 && exit 29 )
 
-if [ ! -d $NEW_HOME_DIR ]; then
+if [[ ! -d $NEW_HOME_DIR ]]; then
     mkdir -p $NEW_HOME_DIR
 fi
-if [ ! -d $FUNCTIONS_TARGET_BACKUP ]; then
+if [[ ! -d $FUNCTIONS_TARGET_BACKUP ]]; then
     mkdir -p $FUNCTIONS_TARGET_BACKUP
 fi
 
 touch $GENERAL_DIR $QUERIED_DIR
 cp $FUNCTIONS_SOURCE_TARGET "${FUNCTIONS_TARGET_BACKUP}"
 
-function installer{
-    if [ -f $PROGRAM_TARGET_LIB ]; then
+function installer {
+    if [[ -f $PROGRAM_TARGET_LIB ]]; then
         echo "WARNING--${PROGRAM_TARGET_LIB} ALREADY EXISTS."
         while true; do
             read -p "overwrite? [y/n]: " OVERWRITE_DECISION || exit
-            if [ "$OVERWRITE_DECISION" == 'y' ]; then
+            if [[ "$OVERWRITE_DECISION" == 'y' ]]; then
                 rm $PROGRAM_TARGET_LIB
                 break
             else
@@ -53,7 +54,7 @@ function installer{
         done
     fi
 
-    if [ -f $FUNCTIONS_SOURCE_TARGET ]; then
+    if [[ -f $FUNCTIONS_SOURCE_TARGET ]]; then
         BEG_FLAG="# BEGIN QUICK-CD FUNCTIONS"
         END_FLAG="# END QUICK-CD FUNCTIONS"
         BEG_FLAG_LINE_NUMBER=$(grep -n "$BEG_FLAG" $FUNCTIONS_SOURCE_TARGET | cut -f 1 -d ':')
@@ -61,8 +62,8 @@ function installer{
         read -a BLN -d ' ' < <(echo "${BEG_FLAG_LINE_NUMBER[@]}")
         read -a ELN -d ' ' < <(echo "${END_FLAG_LINE_NUMBER[@]}")
         BIN=0; EIN=$((${#ELN[@]} - 1))
-        if [ ${#BLN[@]} -eq ${#ELN[@]} ]; then
-            if [ $EIN -ne -1 ]; then
+        if [[ ${#BLN[@]} -eq ${#ELN[@]} ]]; then
+            if [[ $EIN -ne -1 ]]; then
                 sed "${BLN[$BIN]},${ELN[$EIN]}d" $FUNCTIONS_SOURCE_TARGET > $FUNCTIONS_TEMP
                 mv $FUNCTIONS_TEMP $FUNCTIONS_SOURCE_TARGET
             fi
@@ -84,7 +85,6 @@ function installer{
 # END QUICK-CD FUNCTIONS
 EOF
     builtin source $FUNCTIONS_SOURCE_TARGET
-    echo "Installation complete."
 }
 
 function function_support_linker {
@@ -93,7 +93,7 @@ function function_support_linker {
     echo "be sourced by the files sourced by BASH environments."
     echo "Linking now..."
 
-    if [ -f $FUNCTIONS_SOURCE_SUPPORT ]; then
+    if [[ -f $FUNCTIONS_SOURCE_SUPPORT ]]; then
         BEG_FLAG="# BEGIN QUICK-CD SUPPORT"
         END_FLAG="# END QUICK-CD SUPPORT"
         BEG_FLAG_LINE_NUMBER=$(grep -n "$BEG_FLAG" $FUNCTIONS_SOURCE_SUPPORT | cut -f 1 -d ':')
@@ -101,7 +101,7 @@ function function_support_linker {
         read -a BLN -d ' ' < <(echo "${BEG_FLAG_LINE_NUMBER[@]}")
         read -a ELN -d ' ' < <(echo "${END_FLAG_LINE_NUMBER[@]}")
         BIN=0; EIN=$((${#ELN[@]} - 1))
-        if [ ${#BLN[@]} -eq ${#ELN[@]} ]; then
+        if [[ ${#BLN[@]} -eq ${#ELN[@]} ]]; then
             if [ $EIN -ne -1 ]; then
                 sed "${BLN[$BIN]},${ELN[$EIN]}d" $FUNCTIONS_SOURCE_SUPPORT > $FUNCTIONS_TEMP
                 mv $FUNCTIONS_TEMP $FUNCTIONS_SOURCE_SUPPORT
@@ -117,12 +117,12 @@ function function_support_linker {
 EOF
 }
 
-if [ ! -z $OSTYPE ]; then
-    if [ $OSTYPE == "darwin12" ]; then
+if [ ! -z $CLIENT_KERNEL ]; then
+    if [[ $CLIENT_KERNEL == darwin* ]]; then
         echo "It is recommended to install without sudo."
         installer
         function_support_linker
-    elif [ $OSTYPE == "gnu-linux" ]; then
+    elif [[ $CLIENT_KERNEL == linux* ]]; then
         echo "It is recommended to install with sudo."
         sudo -p "${USER}, please provide your password to allow sudo: " installer
     else
@@ -130,4 +130,4 @@ if [ ! -z $OSTYPE ]; then
     fi
 fi
 
-echo 'Installation complete!'
+echo 'Installation complete.'

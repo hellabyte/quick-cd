@@ -29,8 +29,8 @@ CD_COUNT=0
 #   directories can be built. Supplemental to qcd, as a more
 #   mature .common_dirs file increases the usability of qcd.
 function cd(){
-    TARGET_DIR=$(echo -e "${1}")
-    builtin cd "$TARGET_DIR" || return
+    TARGET_DIR=$(echo -e "${@}")
+    builtin cd "${TARGET_DIR}" || return
     builtin echo "$(pwd)" >> $GENERAL_DIRS
     builtin let CD_COUNT++
     # Low number specific to local session redundancy.

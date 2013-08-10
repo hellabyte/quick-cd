@@ -105,7 +105,7 @@ while getopts ":a:d:p:i:s:t:h" OPTNAME; do
     esac
 done
 OPTIND=1 # shift $(( OPTIND - 1 )) not working on OS 10.8.4
-VAL="${@: -1}"
+VAL="${@:-1}"
 if [ -z "$SEARCHTERM" ] && [ -n "$VAL" ]; then
     SEARCHTERM="*${VAL}*"
 fi
