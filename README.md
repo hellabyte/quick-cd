@@ -41,30 +41,28 @@ It is also possible to use git:
     bash install.bash [alternate lib path] [alternate bin path]
 
 You can remove the directory that git clone creates after a successful install.  
-Otherwise, enjoy qcd and try not to get too spoiled!
+Otherwise, enjoy qcd and try not to get too spoiled~~~~~~
     
 Usage
 =====
 
-qcd annoying-to-reach-manually-directory-keyword
+    $ qcd annoying-to-reach-manually-directory-keyword
 
 For more info:  
-    qcd -h
+    $ qcd -h
 
 Desired Future Modifications
 ============================
 ### Important Feature TODOs: ###
-*Keyword completion.  
-*ZSH compatibility.  
+* Keyword completion.  
+* ZSH compatibility.  
+* Allow / in file search for non-conventional search.
 
 
 #### General TODOs: ####
-*Increase portability.                    
-*Increase performance.                    
-*Increase readability.                    
-    Increase intelligence of general_dirs.   
-
-Make sure that any updates to the program have the version date updated in the functions.bash
-file as well (4th comment line).
+* Increase portability.                    
+* Increase performance.                    
+* Increase readability.                    
+* Increase intelligence of general\_dirs.   
 
 (C) 2013 - August - 22 Nathaniel Hellabyte nate@hellabit.es
