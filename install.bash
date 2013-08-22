@@ -1,9 +1,9 @@
 #!/bin/bash
-# (C) 2013 - July - 06
+# (C) 2013 - August - 22
 # Nathaniel Hellabyte
 # nate@hellabit.es
 # RECOMMENDED USAGE
-#   bash ./install.bash
+#   bash ./install.bash [PROGRAM_TARGET_LIB_PATH] [PROGRAM_TARGET_BIN_PATH]
 # INSTALLS quick-cd.bash
 # TO       /usr/local/lib 
 #          /usr/local/bin
@@ -29,14 +29,23 @@ FUNCTIONS_TEMP="${FUNCTIONS_TARGET_BACKUP}/.supporting_rc_temp"
 FUNCTIONS_SOURCE_SUPPORT="${USER_HOME}/.bash_profile"
 CLIENT_KERNEL="$(uname -s | awk '{print tolower($0)}')"
 
-[[ -f $PROGRAM_RAW ]] || ( echo "Please change into directory containing install files" >&2 && exit 29 )
+if [[ $CLIENT_KERNEL == linux* ]]; then
+    echo "If you do not have sudo access, consider creating the directories"
+    echo -e "\t${HOME}/lib ${HOME}/bin"
+    echo "And passing them to the installer like so:"
+    echo -e "\t\$ bash install.bash ${HOME}/lib ${HOME}/bin"
+    echo "It is recommended to install with sudo, otherwise."
+    sleep 1
+fi
 
-if [[ ! -d $NEW_HOME_DIR ]]; then
-    mkdir -p $NEW_HOME_DIR
-fi
-if [[ ! -d $FUNCTIONS_TARGET_BACKUP ]]; then
-    mkdir -p $FUNCTIONS_TARGET_BACKUP
-fi
+
+[[ -f $PROGRAM_RAW ]] || (  
+        echo "Please change into directory containing install files" >&2 && 
+            exit 29 
+    )
+
+[[ ! -d $NEW_HOME_DIR ]] && mkdir -p $NEW_HOME_DIR || :
+[[ ! -d $FUNCTIONS_TARGET_BACKUP ]] && mkdir -p $FUNCTIONS_TARGET_BACKUP || :
 
 touch $GENERAL_DIR $QUERIED_DIR
 cp $FUNCTIONS_SOURCE_TARGET "${FUNCTIONS_TARGET_BACKUP}"
@@ -59,8 +68,12 @@ function installer {
     if [[ -f $FUNCTIONS_SOURCE_TARGET ]]; then
         BEG_FLAG="# BEGIN QUICK-CD FUNCTIONS"
         END_FLAG="# END QUICK-CD FUNCTIONS"
-        BEG_FLAG_LINE_NUMBER=$(grep -n "$BEG_FLAG" $FUNCTIONS_SOURCE_TARGET | cut -f 1 -d ':')
-        END_FLAG_LINE_NUMBER=$(grep -n "$END_FLAG" $FUNCTIONS_SOURCE_TARGET | cut -f 1 -d ':')
+        BEG_FLAG_LINE_NUMBER=$(
+            grep -n "$BEG_FLAG" $FUNCTIONS_SOURCE_TARGET | cut -f 1 -d ':'
+        )
+        END_FLAG_LINE_NUMBER=$(
+            grep -n "$END_FLAG" $FUNCTIONS_SOURCE_TARGET | cut -f 1 -d ':'
+        )
         read -a BLN -d ' ' < <(echo "${BEG_FLAG_LINE_NUMBER[@]}")
         read -a ELN -d ' ' < <(echo "${END_FLAG_LINE_NUMBER[@]}")
         BIN=0; EIN=$((${#ELN[@]} - 1))
@@ -82,7 +95,8 @@ function installer {
     cat << EOF >> $FUNCTIONS_SOURCE_TARGET 
 # BEGIN QUICK-CD FUNCTIONS
 # DO NOT DELETE ABOVE COMMENT
-[[ -f "$FUNCTIONS_TARGET_STRING" ]] && builtin source "$FUNCTIONS_TARGET_STRING" || :
+[[ -f "$FUNCTIONS_TARGET_STRING" ]] && 
+    builtin source "$FUNCTIONS_TARGET_STRING" || :
 # DO NOT DELETE BELOW COMMENT
 # END QUICK-CD FUNCTIONS
 EOF
@@ -114,19 +128,31 @@ function function_support_linker {
     fi
     cat << EOF >> $FUNCTIONS_SOURCE_SUPPORT   
 # BEGIN QUICK-CD SUPPORT -- DO NOT DELETE
-[[ -f "$FUNCTIONS_SOURCE_TARGET_STRING" ]] && builtin source "$FUNCTIONS_SOURCE_TARGET_STRING" || :
+[[ -f "$FUNCTIONS_SOURCE_TARGET_STRING" ]] && 
+    builtin source "$FUNCTIONS_SOURCE_TARGET_STRING" || :
 # END QUICK-CD SUPPORT -- DO NOT DELETE
 EOF
 }
 
 if [ ! -z $CLIENT_KERNEL ]; then
     if [[ $CLIENT_KERNEL == darwin* ]]; then
-        echo "It is recommended to install without sudo."
+        echo "INSTALLING..."
         installer
+        echo "ADDING FUNCTION SUPPORT..."
         function_support_linker
-    elif [[ $CLIENT_KERNEL == linux* ]]; then
-        echo "It is recommended to install with sudo."
+    elif [[ $CLIENT_KERNEL == linux* ]] && ( 
+            [[ $1 == /usr/local/lib* ]] || 
+            [[ $2 == /usr/local/bin* ]] 
+        ); then
+        echo "If you do not have sudo access, consider creating the directories"
+        echo -e "\t${HOME}/bin ${HOME}/lib"
+        echo "And passing them to the installer like so:"
+        echo -e "\t\$ bash install.bash ${HOME}/bin ${HOME}/lib"
+        echo "It is recommended to install with sudo, otherwise"
         sudo -p "${USER}, please provide your password to allow sudo: " installer
+    elif [[ $CLIENT_KERNEL == linux* ]]; then
+        echo "INSTALLING..."
+        installer
     else
         echo "Operating System unrecognized." >&2 && exit 96
     fi
