@@ -19,7 +19,7 @@ For Mac OS X, it is recommended to do the following with a
 
     tar -C /usr/local/lib/quick-cd -xzvf quick-cd.tar.gz
     cd /usr/local/lib/quick-cd  
-    bash install.bash  \[alternate lib path\] \[alternate bin path\]
+    bash install.bash  [alternate lib path] [alternate bin path]
 
 For Linux, follow the same steps. You may be prompted for a password during install.
 This password gives the program needed sudo access.  
@@ -38,7 +38,7 @@ It is also possible to use git:
 
     git clone https://github.com/hellabyte/quick-cd.git  
     cd ./quick-cd  
-    bash install.bash \[alternate lib path\] \[alternate bin path\]
+    bash install.bash [alternate lib path] [alternate bin path]
 
 You can remove the directory that git clone creates after a successful install.  
 Otherwise, enjoy qcd and try not to get too spoiled!
@@ -54,17 +54,17 @@ For more info:
 Desired Future Modifications
 ============================
 ### Important Feature TODOs: ###
-    Keyword completion.  
-    ZSH compatibility.  
+*Keyword completion.  
+*ZSH compatibility.  
 
 
 #### General TODOs: ####
-    Increase portability.                    
-    Increase performance.                    
-    Increase readability.                    
+*Increase portability.                    
+*Increase performance.                    
+*Increase readability.                    
     Increase intelligence of general_dirs.   
 
 Make sure that any updates to the program have the version date updated in the functions.bash
 file as well (4th comment line).
 
-(C) 2013 - July - 06 Nathaniel Hellabyte nate@hellabit.es
+(C) 2013 - August - 22 Nathaniel Hellabyte nate@hellabit.es

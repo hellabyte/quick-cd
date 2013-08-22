@@ -1,5 +1,5 @@
 #!/bin/bash
-# (C) 2013 - July - 05
+# (C) 2013 - August - 22
 # Nathaniel Hellabyte
 # nate@hellabit.es
 # = = = = = = = = = = =-
