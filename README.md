@@ -17,20 +17,28 @@ Note that qcd must reside sourced in the current enviroment to be of use.
 For Mac OS X, it is recommended to do the following with a
  tar.gz until a formal installer is in place:
 
-tar -C /usr/local/lib/quick-cd -xzvf quick-cd.tar.gz
-cd /usr/local/lib/quick-cd  
-bash install.bash  
+    tar -C /usr/local/lib/quick-cd -xzvf quick-cd.tar.gz
+    cd /usr/local/lib/quick-cd  
+    bash install.bash  \[alternate lib path\] \[alternate bin path\]
 
-For Linux, follow the same steps. You will be prompted for a password during install.
-This password gives the program needed sudo access.
+For Linux, follow the same steps. You may be prompted for a password during install.
+This password gives the program needed sudo access.  
+
+If you do not have sudo access, set the alternate lib path and bin path to 
+something within your home folder, such as ${HOME}/lib and ${HOME}/bin 
+respectively.  
+
+NOTE that you will need to create these directories yourself with mkdir:  
+
+    $ mkdir ${HOME}/lib ${HOME}/bin
 
 You may want to remove the tarball after statisifed that the package installed correctly.
 
 It is also possible to use git:
 
-git clone https://github.com/hellabyte/quick-cd.git  
-cd ./quick-cd  
-bash install.bash
+    git clone https://github.com/hellabyte/quick-cd.git  
+    cd ./quick-cd  
+    bash install.bash \[alternate lib path\] \[alternate bin path\]
 
 You can remove the directory that git clone creates after a successful install.  
 Otherwise, enjoy qcd and try not to get too spoiled!
