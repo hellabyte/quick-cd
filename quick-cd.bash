@@ -50,9 +50,9 @@ QUICKCD_HOME_ROOT="${HOME}/.quick-cd"
 GENERAL_DIRS="${QUICKCD_HOME_ROOT}/.general_dirs"
 QUERIED_DIRS="${QUICKCD_HOME_ROOT}/.queried_dirs"
 TEMP_DIRS="${QUICKCD_HOME_ROOT}/.tdirs"
-if [ ! -d $QUICKCD_HOME_ROOT ]; then mkdir $QUICKCD_HOME_ROOT; fi
-if [ ! -f $GENERAL_DIRS ]; then touch $GENERAL_DIRS; fi
-if [ ! -f $QUERIED_DIRS ]; then touch $QUERIED_DIRS; fi
+[[ ! -d $QUICKCD_HOME_ROOT ]] && mkdir $QUICKCD_HOME_ROOT
+[[ ! -f $GENERAL_DIRS ]]      && touch $GENERAL_DIRS
+[[ ! -f $QUERIED_DIRS ]]      && touch $QUERIED_DIRS
 sort $GENERAL_DIRS | uniq > $TEMP_DIRS
 while read LINE; do
     BASEDIRS+=("$LINE")
