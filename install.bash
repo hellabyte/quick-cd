@@ -128,8 +128,10 @@ function function_support_linker {
     fi
     cat << EOF >> $FUNCTIONS_SOURCE_SUPPORT   
 # BEGIN QUICK-CD SUPPORT -- DO NOT DELETE
-[[ -f "$FUNCTIONS_SOURCE_TARGET_STRING" ]] && 
-    builtin source "$FUNCTIONS_SOURCE_TARGET_STRING" || :
+if [[ \$(uname -s) = "Darwin" ]]; then
+    [[ -f "$FUNCTIONS_SOURCE_TARGET_STRING" ]] && 
+        builtin source "$FUNCTIONS_SOURCE_TARGET_STRING" || :
+fi
 # END QUICK-CD SUPPORT -- DO NOT DELETE
 EOF
 }
