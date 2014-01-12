@@ -92,14 +92,14 @@ function installer {
     [[ -f $PROGRAM_TARGET_BIN ]] && ( rm $PROGRAM_TARGET_BIN || exit 75 )
     ln -s $PROGRAM_TARGET_LIB $PROGRAM_TARGET_BIN || exit 77
     cp $FUNCTIONS_RAW $FUNCTIONS_TARGET || exit 78
-    cat << EOF >> $FUNCTIONS_SOURCE_TARGET 
+    cat << ____EOF >> $FUNCTIONS_SOURCE_TARGET 
 # BEGIN QUICK-CD FUNCTIONS
 # DO NOT DELETE ABOVE COMMENT
-[[ -f "$FUNCTIONS_TARGET_STRING" ]] && 
+[[ -f "$FUNCTIONS_TARGET_STRING" ]] && \\
     builtin source "$FUNCTIONS_TARGET_STRING" || :
 # DO NOT DELETE BELOW COMMENT
 # END QUICK-CD FUNCTIONS
-EOF
+____EOF
     builtin source $FUNCTIONS_SOURCE_TARGET
 }
 
@@ -118,7 +118,7 @@ function function_support_linker {
         read -a ELN -d ' ' < <(echo "${END_FLAG_LINE_NUMBER[@]}")
         BIN=0; EIN=$((${#ELN[@]} - 1))
         if [[ ${#BLN[@]} -eq ${#ELN[@]} ]]; then
-            if [ $EIN -ne -1 ]; then
+            if [[ $EIN -ne -1 ]]; then
                 sed "${BLN[$BIN]},${ELN[$EIN]}d" $FUNCTIONS_SOURCE_SUPPORT > $FUNCTIONS_TEMP
                 mv $FUNCTIONS_TEMP $FUNCTIONS_SOURCE_SUPPORT
             fi
@@ -126,17 +126,16 @@ function function_support_linker {
             echo "WARNING -- Manual tidying of $FUNCTIONS_SOURCE_SUPPORT required." >&2
         fi
     fi
-    cat << EOF >> $FUNCTIONS_SOURCE_SUPPORT   
+    cat << ____EOF >> $FUNCTIONS_SOURCE_SUPPORT   
 # BEGIN QUICK-CD SUPPORT -- DO NOT DELETE
-if [[ \$(uname -s) = "Darwin" ]]; then
-    [[ -f "$FUNCTIONS_SOURCE_TARGET_STRING" ]] && 
+[[ \$(uname -s) = "Darwin" ]] &&
+    [[ -f "$FUNCTIONS_SOURCE_TARGET_STRING" ]] && \\
         builtin source "$FUNCTIONS_SOURCE_TARGET_STRING" || :
-fi
 # END QUICK-CD SUPPORT -- DO NOT DELETE
-EOF
+____EOF
 }
 
-if [ ! -z $CLIENT_KERNEL ]; then
+if [[ ! -z $CLIENT_KERNEL ]]; then
     if [[ $CLIENT_KERNEL == darwin* ]]; then
         echo "INSTALLING..."
         installer
