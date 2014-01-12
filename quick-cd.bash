@@ -1,5 +1,5 @@
-#!/bin/bash
-# (C) 2013 - August - 22
+#!/usr/bin/env bash
+# (C) 2014 - January 12
 # Nathaniel Hellabyte
 # nate@hellabit.es
 # = = = = = = = = = = =-
@@ -9,7 +9,7 @@ function print_help(){
 NAME
     qcd -- quick change directory
 SYNOPSIS
-    qcd [-d <depth>] [-a <path>] [-p <path>] [-i <index>] [-t <time>] [-s] <searchterm>
+    qcd [-d <depth>] [-ap <path>] [-i <index>] [-t <time>] [-s] <searchterm>
 DESCRIPTION
   MAIN PROGRAM LOOP:
         find \$BASEDIRS -maxdepth \$MAXDEPTH -type d -iname \$SEARCHTERM 
@@ -41,7 +41,8 @@ DESCRIPTION
 ____EOF
 }
 if [ $# == 0 ]; then
-    echo "ERROR -- qcd requires arguments. Pass -h for help." >&2
+    echo "ERROR -- qcd requires arguments. Printing help text." >&2
+    print_help
     return 1
 fi
 BASEDIRS=(); PATHS=()
@@ -54,25 +55,29 @@ TEMP_DIRS="${QUICKCD_HOME_ROOT}/.tdirs"
 [[ ! -f $GENERAL_DIRS ]]      && touch $GENERAL_DIRS      || :
 [[ ! -f $QUERIED_DIRS ]]      && touch $QUERIED_DIRS      || :
 
-sort $GENERAL_DIRS | uniq > $TEMP_DIRS
-
+awk -F/ '{ if( $5 ) { print $2FS$3FS$4 } else { print } }' $GENERAL_DIRS | \
+    sort -u > $TEMP_DIRS
 while read LINE; do BASEDIRS+=("$LINE"); done < "${TEMP_DIRS}"
-
 mv $TEMP_DIRS $GENERAL_DIRS
+
 OPTIND=1
 while getopts ":a:d:p:i:s:t:h" OPTNAME; do
     case $OPTNAME in
         'a')
             APPEND_DIR=$OPTARG
-            if [ -d $APPEND_DIR ]; then
+            if [[ -d $APPEND_DIR ]]; then
                 echo "${OPTARG}" >> $GENERAL_DIRS
             else
-                echo "${OPTARG} is an invalid specification for -a" >&2
+                [[ -z $APPEND_DIR ]] && \
+                    echo "No directory given for -a." >&2 && return 2
+                echo "${OPTARG} is an invalid specification for -a" >&2 
                 return 1
             fi
             ;;
         'd')
             MAXDEPTH=$OPTARG
+            [[ -z $MAXDEPTH ]] && \
+                echo "No depth given for -d." >&2 && return 2
             ;;
         'p')
             while read -r -d $'\0'; do
@@ -81,7 +86,9 @@ while getopts ":a:d:p:i:s:t:h" OPTNAME; do
             ;;
         'i')
             INDEX=$OPTARG
-            if [ $INDEX -gt -1 ] && [ -f $QUERIED_DIRS ]; then
+            [[ -z $INDEX ]] && \
+                echo "No index given for -i." >&2 && return 2
+            if [[ $INDEX -gt -1 ]] && [[ -f $QUERIED_DIRS ]]; then
                 while read LINE; do
                     PATHS+=("$LINE")
                 done < "$QUERIED_DIRS"
@@ -90,39 +97,44 @@ while getopts ":a:d:p:i:s:t:h" OPTNAME; do
             fi
             ;;
         's')
-            SEARCHTERM="*${OPTARG}*"
+            SEARCHTERM="$OPTARG"
+            [[ -z $SEARCHTERM ]] && \
+                echo "No search term given for -s." >&2 && return 2
+            SEARCHTERM="*${SEARCHTERM}*"
             ;;
         't') 
             TIME_OUT=$OPTARG
+            [[ -z $TIME_OUT ]] && \
+                echo "No time given for -t." >&2 && return 2
             ;;
         'h' ) 
             print_help
-            return 2
+            return 5
             ;;
         : | ? | *)
             echo "Option -${OPTARG} requires an argument." >&2
             return 1
             ;;
     esac
+    shift 2; OPTIND=1
 done
-OPTIND=1 # shift $(( OPTIND - 1 )) not working on OS 10.8.4
-VAL="${@:-1}"
-if [[ -z "$SEARCHTERM" ]] && [[ -n "$VAL" ]]; then SEARCHTERM="*${VAL}*"; fi
-if [[ -n "${SEARCHTERM}" ]]; then
-    while read -r -d $'\0'; do
-        PATHS+=("$REPLY")
-    done < <(find ${BASEDIRS[@]} -type d \
-        -maxdepth $MAXDEPTH -iname "$SEARCHTERM" -print0 2> /dev/null)
-else 
-    echo "No search term provided." >&2
-    return 1
+
+if [[ -z "$SEARCHTERM" ]] && [[ -n "$@" ]]; then 
+    SEARCHTERM="*${@}*"
+else
+    echo "No search term provided." >&2; return 1
 fi
+
+while read -r -d $'\0'; do
+    PATHS+=("$REPLY")
+done < <(find ${BASEDIRS[@]} -type d \
+    -maxdepth $MAXDEPTH -iname "$SEARCHTERM" -print0 2> /dev/null)
 # PATHS pruner
-echo -n '' > $QUERIED_DIRS
+: > $QUERIED_DIRS
 while read -d $'\0' QPATHNAME; do
     echo "$QPATHNAME" >> $QUERIED_DIRS
 done < <(printf "%s\0" "${PATHS[@]}")
-sort $QUERIED_DIRS | uniq > $TEMP_DIRS
+sort -u $QUERIED_DIRS > $TEMP_DIRS
 PATHS=()
 while read LINE; do
     PATHS+=("$LINE")
@@ -135,7 +147,8 @@ if [ "$LENGTH" == 0 ]; then
     return 3
 elif [ "$LENGTH" == 1 ]; then
     if [ "${PATHS[0]}" = "" ]; then
-        echo "Result not found. Consider increasing depth from current value of $MAXDEPTH with -d flag." >&2
+        echo -n "Result not found. Consider increasing depth from current " >&2
+        echo -n "value of $MAXDEPTH with -d flag." >&2
         return 3
     else
         cd ${PATHS[0]}
