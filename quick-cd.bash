@@ -5,11 +5,10 @@
 # = = = = = = = = = = =-
 
 function print_help(){
-cat << EOF
+    cat << ____EOF
 NAME
     qcd -- quick change directory
 SYNOPSIS
-    qcd [-asdpith]
     qcd [-d <depth>] [-a <path>] [-p <path>] [-i <index>] [-t <time>] [-s] <searchterm>
 DESCRIPTION
   MAIN PROGRAM LOOP:
@@ -18,30 +17,31 @@ DESCRIPTION
     -a 
         Appends directory specified to ${HOME}/.quick-cd/.general_dirs.
     -s
-        Specifies which directory to find. RECOMMENDED use when other flags are implemented.
-        Program will try to search for last option even if -s is not passed.
-        Note that program automatically wraps search term in globs (*<searchterm>*).
+        Specifies which directory to find. RECOMMENDED: use when other flags are 
+        implemented. Program will try to search for last option even if -s is 
+        not passed. Note that program automatically wraps search term in 
+        globs (*<searchterm>*).
     -d
         Specifies maximum depth to search from base, default value is 3.
         Less than 3 is usually too shallow, greater than 3 comprimises speed.
-        It is better to pass a path with -p than to increase depth for large filesystems.
-        Note also that as qcd matures it's general directory database, a lower depth
-        will work more often.
+        It is better to pass a path with -p than to increase depth for large 
+        filesystems. Note also that as qcd matures it's general directory 
+        database, a lower depth will work more often.
     -p
-        Specifies Path(s) to launch search from.
-        The speed of target acquistion is dependent on distance from base.
-        To include multiple paths, enclose in double quotes.
+        Specifies Path(s) to launch search from. The speed of target acquistion 
+        is dependent on distance from base. To include multiple paths, enclose 
+        in double quotes.
     -i
         Specifies which directory to switch to when multiple matches are found.
     -t 
-        Specifies time given to select the currect directory from a multiple matching.
-        Default value is 30 seconds. Set to 0 to only print matches.
+        Specifies time given to select the currect directory from a multiple 
+        matching. Default value is 30 seconds. Set to 0 to only print matches.
     -h
         Prints this help message.
-EOF
+____EOF
 }
 if [ $# == 0 ]; then
-    echo "ERROR -- qcd requires arguments." >&2
+    echo "ERROR -- qcd requires arguments. Pass -h for help." >&2
     return 1
 fi
 BASEDIRS=(); PATHS=()
@@ -50,13 +50,14 @@ QUICKCD_HOME_ROOT="${HOME}/.quick-cd"
 GENERAL_DIRS="${QUICKCD_HOME_ROOT}/.general_dirs"
 QUERIED_DIRS="${QUICKCD_HOME_ROOT}/.queried_dirs"
 TEMP_DIRS="${QUICKCD_HOME_ROOT}/.tdirs"
-[[ ! -d $QUICKCD_HOME_ROOT ]] && mkdir $QUICKCD_HOME_ROOT
-[[ ! -f $GENERAL_DIRS ]]      && touch $GENERAL_DIRS
-[[ ! -f $QUERIED_DIRS ]]      && touch $QUERIED_DIRS
+[[ ! -d $QUICKCD_HOME_ROOT ]] && mkdir $QUICKCD_HOME_ROOT || :
+[[ ! -f $GENERAL_DIRS ]]      && touch $GENERAL_DIRS      || :
+[[ ! -f $QUERIED_DIRS ]]      && touch $QUERIED_DIRS      || :
+
 sort $GENERAL_DIRS | uniq > $TEMP_DIRS
-while read LINE; do
-    BASEDIRS+=("$LINE")
-done < "${TEMP_DIRS}"
+
+while read LINE; do BASEDIRS+=("$LINE"); done < "${TEMP_DIRS}"
+
 mv $TEMP_DIRS $GENERAL_DIRS
 OPTIND=1
 while getopts ":a:d:p:i:s:t:h" OPTNAME; do
@@ -98,7 +99,7 @@ while getopts ":a:d:p:i:s:t:h" OPTNAME; do
             print_help
             return 2
             ;;
-        : | \? | \*)
+        : | ? | *)
             echo "Option -${OPTARG} requires an argument." >&2
             return 1
             ;;
@@ -106,10 +107,8 @@ while getopts ":a:d:p:i:s:t:h" OPTNAME; do
 done
 OPTIND=1 # shift $(( OPTIND - 1 )) not working on OS 10.8.4
 VAL="${@:-1}"
-if [ -z "$SEARCHTERM" ] && [ -n "$VAL" ]; then
-    SEARCHTERM="*${VAL}*"
-fi
-if [ -n "${SEARCHTERM}" ]; then
+if [[ -z "$SEARCHTERM" ]] && [[ -n "$VAL" ]]; then SEARCHTERM="*${VAL}*"; fi
+if [[ -n "${SEARCHTERM}" ]]; then
     while read -r -d $'\0'; do
         PATHS+=("$REPLY")
     done < <(find ${BASEDIRS[@]} -type d \
